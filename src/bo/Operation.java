@@ -1,8 +1,12 @@
 package bo;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Operation {
+
+    private List<Operation> listOperation = new ArrayList<>();
     private int id;
     private String type;
     private Date date;
