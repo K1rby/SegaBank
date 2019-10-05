@@ -1,6 +1,6 @@
 package dao;
 
-import bo.Compte;
+import bo.CompteEpargne;
 import dal.IDAO;
 import dal.PersistanceManager;
 
@@ -9,16 +9,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompteDAO implements IDAO<Long, Compte> {
+public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type) VALUES (?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ? WHERE id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, tauxInteret, idAgence) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET tauxInteret = ?, SET idAgence = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
     private static final String FIND_ALLQUERY = "SELECT * FROM compte";
 
     @Override
-    public void create(Compte object) throws SQLException, IOException, ClassNotFoundException {
+    public void create(CompteEpargne object) throws SQLException, IOException, ClassNotFoundException {
 
         Connection connection = PersistanceManager.getConnection();
         if (connection != null) {
@@ -26,6 +26,8 @@ public class CompteDAO implements IDAO<Long, Compte> {
 
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
+                ps.setFloat(3, object.getTauxInteret());
+                ps.setInt(4, object.getIdAgence());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -39,7 +41,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
     }
 
     @Override
-    public void update(Compte object) throws SQLException, IOException, ClassNotFoundException {
+    public void update(CompteEpargne object) throws SQLException, IOException, ClassNotFoundException {
 
         Connection connection = PersistanceManager.getConnection();
         if (connection != null) {
@@ -48,7 +50,9 @@ public class CompteDAO implements IDAO<Long, Compte> {
 
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
-                ps.setInt(3, object.getId());
+                ps.setFloat(3, object.getTauxInteret());
+                ps.setFloat(4, object.getIdAgence());
+                ps.setInt(5, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -56,7 +60,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
     }
 
     @Override
-    public void remove(Compte object) throws SQLException, IOException, ClassNotFoundException {
+    public void remove(CompteEpargne object) throws SQLException, IOException, ClassNotFoundException {
 
         Connection connection = PersistanceManager.getConnection();
         if (connection != null) {
@@ -69,10 +73,10 @@ public class CompteDAO implements IDAO<Long, Compte> {
     }
 
     @Override
-    public Compte findById(Long aLong) throws SQLException, IOException, ClassNotFoundException {
+    public CompteEpargne findById(Long aLong) throws SQLException, IOException, ClassNotFoundException {
 
         Connection connection = PersistanceManager.getConnection();
-        Compte compte = null;
+        CompteEpargne compte_epargne = new CompteEpargne();
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_QUERY)) {
@@ -80,22 +84,23 @@ public class CompteDAO implements IDAO<Long, Compte> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     if (rs.next()) {
-                        //compte = new CompteSimple();
-                        compte.setId(rs.getInt("id"));
-                        compte.setSolde(rs.getDouble("solde"));
-                        compte.setType(rs.getString("type"));
+                        compte_epargne.setId(rs.getInt("id"));
+                        compte_epargne.setSolde(rs.getDouble("solde"));
+                        compte_epargne.setType(rs.getString("type"));
+                        compte_epargne.setTauxInteret(rs.getInt("tauxInteret"));
+                        compte_epargne.setIdAgence(rs.getInt("idAgence"));
                     }
                 }
             }
         }
-        return compte;
+        return compte_epargne;
     }
 
     @Override
-    public List<Compte> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<CompteEpargne> findAll() throws SQLException, IOException, ClassNotFoundException {
 
-        List<Compte> list = new ArrayList<>();
-        Compte compte = null;
+        List<CompteEpargne> list = new ArrayList<>();
+        CompteEpargne compte_epargne = new CompteEpargne();
         Connection connection = PersistanceManager.getConnection();
 
         if (connection != null) {
@@ -104,11 +109,12 @@ public class CompteDAO implements IDAO<Long, Compte> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
-                        //compte = new Compte();
-                        compte.setId(rs.getInt("id"));
-                        compte.setSolde(rs.getDouble("solde"));
-                        compte.setType(rs.getString("type"));
-                        list.add(compte);
+                        compte_epargne.setId(rs.getInt("id"));
+                        compte_epargne.setSolde(rs.getDouble("solde"));
+                        compte_epargne.setType(rs.getString("type"));
+                        compte_epargne.setTauxInteret(rs.getInt("TauxInteret"));
+                        compte_epargne.setIdAgence(rs.getInt("idAgence"));
+                        list.add(compte_epargne);
                     }
                 }
             }

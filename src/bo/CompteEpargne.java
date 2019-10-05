@@ -17,10 +17,7 @@ public class CompteEpargne extends Compte {
     }
 
     //Constructeur
-    public CompteEpargne(int id, long solde, String type, float tauxInteret) {
-        super(id, solde, type);
-        this.tauxInteret = tauxInteret;
-    }
+    public CompteEpargne() { }
 
     //Méthodes
     @Override
