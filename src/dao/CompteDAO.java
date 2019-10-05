@@ -1,7 +1,6 @@
 package dao;
 
 import bo.Compte;
-import bo.CompteSimple;
 import dal.IDAO;
 import dal.PersistanceManager;
 
@@ -110,6 +109,6 @@ public class CompteDAO implements IDAO<Long, Compte> {
                 }
             }
         }
-        return null;
+        return list;
     }
 }

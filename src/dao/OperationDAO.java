@@ -1,6 +1,5 @@
 package dao;
 
-import bo.Agence;
 import bo.Operation;
 import dal.IDAO;
 import dal.PersistanceManager;
