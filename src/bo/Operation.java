@@ -32,7 +32,7 @@ public class Operation {
     }
 
     public java.sql.Date getDate() {
-        return date;
+        return (java.sql.Date) date;
     }
 
     public void setDate(Date date) {

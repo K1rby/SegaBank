@@ -5,8 +5,17 @@ public abstract class Compte {
     //Attributs
     protected int id;
     protected double solde;
+    protected String type;
 
     //Accesseurs
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public int getId() {
         return id;
     }
@@ -24,9 +33,10 @@ public abstract class Compte {
     }
 
     //Constructeur
-    public Compte(int id, long solde) {
+    public Compte(int id, long solde, String type) {
         this.id = id;
         this.solde = solde;
+        this.type = type;
     }
 
     //Méthodes
