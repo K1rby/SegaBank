@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Operation {
 
+    //Attributs
     private List<Operation> listOperation = new ArrayList<>();
     private int id;
     private String type;
@@ -14,10 +15,10 @@ public class Operation {
     private int idAgence;
     private int idCompte;
 
+    //Accesseurs
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -59,6 +60,24 @@ public class Operation {
     }
 
     public void setIdCompte(int idCompte) {
+        this.idCompte = idCompte;
+    }
+
+    public List<Operation> getListOperation() {
+        return listOperation;
+    }
+
+    public void setListOperation(List<Operation> listOperation) {
+        this.listOperation = listOperation;
+    }
+
+    //Constructeur
+    public Operation(int id, String type, Date date, int montant, int idAgence, int idCompte) {
+        this.id = id;
+        this.type = type;
+        this.date = date;
+        this.montant = montant;
+        this.idAgence = idAgence;
         this.idCompte = idCompte;
     }
 }
