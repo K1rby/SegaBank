@@ -11,8 +11,8 @@ import java.util.List;
 
 public class CompteDAO implements IDAO<Long, Compte> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (solde) VALUES (?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ? WHERE id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type) VALUES (?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
     private static final String FIND_ALLQUERY = "SELECT * FROM compte";
@@ -25,6 +25,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
             try (PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
 
                 ps.setDouble(1, object.getSolde());
+                ps.setString(2, object.getType());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -46,7 +47,8 @@ public class CompteDAO implements IDAO<Long, Compte> {
             try (PreparedStatement ps = connection.prepareStatement(UPDATE_QUERY)) {
 
                 ps.setDouble(1, object.getSolde());
-                ps.setInt(2, object.getId());
+                ps.setString(2, object.getType());
+                ps.setInt(3, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -81,6 +83,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
                         //compte = new CompteSimple();
                         compte.setId(rs.getInt("id"));
                         compte.setSolde(rs.getDouble("solde"));
+                        compte.setType(rs.getString("type"));
                     }
                 }
             }
@@ -100,10 +103,11 @@ public class CompteDAO implements IDAO<Long, Compte> {
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
                 try(ResultSet rs = ps.executeQuery()) {
 
-                    if (rs.next()) {
+                    while (rs.next()) {
                         //compte = new Compte();
                         compte.setId(rs.getInt("id"));
                         compte.setSolde(rs.getDouble("solde"));
+                        compte.setType(rs.getString("type"));
                         list.add(compte);
                     }
                 }
