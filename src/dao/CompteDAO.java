@@ -1,18 +1,21 @@
 package dao;
 
+import bo.Compte;
 import dal.IDAO;
 import dal.PersistanceManager;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompteDAO implements IDAO<Long, Compte> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (nom, email) VALUES (?,?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET nom = ?, email = ? WHERE id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO compte (solde) VALUES (?)";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM contact";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
 
     @Override
     public void create(Compte object) throws SQLException, IOException, ClassNotFoundException {
@@ -21,8 +24,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
         if (connection != null) {
             try (PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
 
-                ps.setString(1, object.getName());
-                ps.setString(2, object.getEmail());
+                ps.setLong(1, object.getSolde());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -43,9 +45,8 @@ public class CompteDAO implements IDAO<Long, Compte> {
 
             try (PreparedStatement ps = connection.prepareStatement(UPDATE_QUERY)) {
 
-                ps.setString(1, object.getName());
-                ps.setString(2, object.getEmail());
-                ps.setInt(3, object.getId());
+                ps.setLong(1, object.getSolde());
+                ps.setInt(2, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -77,14 +78,37 @@ public class CompteDAO implements IDAO<Long, Compte> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     if (rs.next()) {
-                        compte = new Compte();
+                        //compte = new CompteSimple();
                         compte.setId(rs.getInt("id"));
-                        compte.setName(rs.getString("nom"));
-                        compte.setEmail(rs.getString("email"));
+                        compte.setSolde(rs.getLong("solde"));
                     }
                 }
             }
         }
         return compte;
+    }
+
+    @Override
+    public List<Compte> findAll() throws SQLException, IOException, ClassNotFoundException {
+
+        List<Compte> list = new ArrayList<>();
+        Compte compte = null;
+        Connection connection = PersistanceManager.getConnection();
+
+        if (connection != null) {
+
+            try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                try(ResultSet rs = ps.executeQuery()) {
+
+                    if (rs.next()) {
+                        //compte = new Compte();
+                        compte.setId(rs.getInt("id"));
+                        compte.setSolde(rs.getLong("solde"));
+                        list.add(compte);
+                    }
+                }
+            }
+        }
+        return list;
     }
 }

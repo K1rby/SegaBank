@@ -30,7 +30,7 @@ public class Operation {
         this.type = type;
     }
 
-    public Date getDate() {
+    public java.sql.Date getDate() {
         return date;
     }
 
