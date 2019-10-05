@@ -102,7 +102,7 @@ public class AgenceDAO implements IDAO<Long, Agence> {
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
                 try(ResultSet rs = ps.executeQuery()) {
 
-                    if (rs.next()) {
+                    while (rs.next()) {
                        // compte = new Compte();
                         agence.setCode(rs.getString("code"));
                         agence.setId(rs.getInt("id"));
