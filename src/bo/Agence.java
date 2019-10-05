@@ -33,8 +33,9 @@ public class Agence {
     }
 
     //Constructeur
-    public Agence(int id, String code, String adresse) {
-        this.id = id;
+    public Agence(){}
+
+    public Agence(String code, String adresse) {
         this.code = code;
         this.adresse = adresse;
     }
