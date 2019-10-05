@@ -6,6 +6,15 @@ public abstract class Compte {
     protected int id;
     protected double solde;
     protected String type;
+    protected int idAgence;
+
+    public int getIdAgence() {
+        return idAgence;
+    }
+
+    public void setIdAgence(int idAgence) {
+        this.idAgence = idAgence;
+    }
 
     //Accesseurs
     public String getType() {
@@ -33,11 +42,7 @@ public abstract class Compte {
     }
     
     //Constructeur
-    public Compte(int id, long solde, String type) {
-        this.id = id;
-        this.solde = solde;
-        this.type = type;
-    }
+    public Compte() { }
 
     //Méthodes
     public abstract void versement(int montant);

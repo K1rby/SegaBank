@@ -3,9 +3,7 @@ package bo;
 public class ComptePayant extends Compte {
 
     //Constructeur
-    public ComptePayant(int id, long solde, String type) {
-        super(id, solde, type);
-    }
+    public ComptePayant(){}
 
     //Méthodes
     @Override
