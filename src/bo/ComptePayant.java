@@ -3,8 +3,8 @@ package bo;
 public class ComptePayant extends Compte {
 
     //Constructeur
-    public ComptePayant(int id, long solde) {
-        super(id, solde);
+    public ComptePayant(int id, long solde, String type) {
+        super(id, solde, type);
     }
 
     //Méthodes

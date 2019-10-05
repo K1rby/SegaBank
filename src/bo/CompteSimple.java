@@ -15,8 +15,8 @@ public class CompteSimple extends Compte {
     }
 
     //Constructeur
-    public CompteSimple(int id, long solde, int decouvert) {
-        super(id, solde);
+    public CompteSimple(int id, long solde, String type, int decouvert) {
+        super(id, solde, type);
         this.decouvert = decouvert;
     }
 
