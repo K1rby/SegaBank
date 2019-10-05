@@ -12,10 +12,10 @@ import java.util.List;
 public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
 
     private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, tauxInteret, idAgence) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET tauxInteret = ?, SET idAgence = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, type = ?, tauxInteret = ?, idAgence = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type=?";
 
     @Override
     public void create(CompteEpargne object) throws SQLException, IOException, ClassNotFoundException {
@@ -100,19 +100,20 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
     public List<CompteEpargne> findAll() throws SQLException, IOException, ClassNotFoundException {
 
         List<CompteEpargne> list = new ArrayList<>();
-        CompteEpargne compte_epargne = new CompteEpargne();
         Connection connection = PersistanceManager.getConnection();
 
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setString(1, "Epargne");
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
+                        CompteEpargne compte_epargne = new CompteEpargne();
                         compte_epargne.setId(rs.getInt("id"));
                         compte_epargne.setSolde(rs.getDouble("solde"));
                         compte_epargne.setType(rs.getString("type"));
-                        compte_epargne.setTauxInteret(rs.getInt("TauxInteret"));
+                        compte_epargne.setTauxInteret(rs.getFloat("TauxInteret"));
                         compte_epargne.setIdAgence(rs.getInt("idAgence"));
                         list.add(compte_epargne);
                     }

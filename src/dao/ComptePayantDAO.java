@@ -12,10 +12,10 @@ import java.util.List;
 public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
 
     private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, idAgence) VALUES (?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET idAgence = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, type = ?, idAgence = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type=?";
 
     @Override
     public void create(ComptePayant object) throws SQLException, IOException, ClassNotFoundException {
@@ -97,15 +97,16 @@ public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
     public List<ComptePayant> findAll() throws SQLException, IOException, ClassNotFoundException {
 
         List<ComptePayant> list = new ArrayList<>();
-        ComptePayant compte_payant = new ComptePayant();
         Connection connection = PersistanceManager.getConnection();
 
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setString(1, "Payant");
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
+                        ComptePayant compte_payant = new ComptePayant();
                         compte_payant.setId(rs.getInt("id"));
                         compte_payant.setSolde(rs.getDouble("solde"));
                         compte_payant.setType(rs.getString("type"));

@@ -12,7 +12,7 @@ import java.util.List;
 public class OperationDAO implements IDAO<Long, Operation> {
 
     private static final String INSERT_QUERY = "INSERT INTO compte (type, date, montant, idAgence, idCompte) VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET type = ?, SET date = ?, SET montant = ?, SET idAgence = ?, SET idCompte = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE compte SET type = ?, date = ?, montant = ?, idAgence = ?, idCompte = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
     private static final String FIND_ALLQUERY = "SELECT * FROM operation";

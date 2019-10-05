@@ -12,11 +12,11 @@ import java.util.List;
 
 public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, decouvert) VALUES (?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET decouvert = ? WHERE id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, decouvert, idAgence) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde= ?, type= ?, decouvert= ?, idAgence=? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
-    private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ? and type=Simple";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type=?";
 
     @Override
     public void create(CompteSimple object) throws SQLException, IOException, ClassNotFoundException {
@@ -28,6 +28,7 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
                 ps.setInt(3, object.getDecouvert());
+                ps.setInt(4, object.getIdAgence());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -51,7 +52,8 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
                 ps.setInt(3, object.getDecouvert());
-                ps.setInt(4, object.getId());
+                ps.setInt(4, object.getIdAgence());
+                ps.setInt(5, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -75,7 +77,7 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
     public CompteSimple findById(Long aLong) throws SQLException, IOException, ClassNotFoundException {
 
         Connection connection = PersistanceManager.getConnection();
-        CompteSimple compte_simple = null;
+        CompteSimple compte_simple = new CompteSimple();
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_QUERY)) {
@@ -83,7 +85,6 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     if (rs.next()) {
-                        //compte = new CompteSimple();
                         compte_simple.setId(rs.getInt("id"));
                         compte_simple.setSolde(rs.getDouble("solde"));
                         compte_simple.setType(rs.getString("type"));
@@ -99,16 +100,16 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
     public List<CompteSimple> findAll() throws SQLException, IOException, ClassNotFoundException {
 
         List<CompteSimple> list = new ArrayList<>();
-        CompteSimple compte_simple = null;
         Connection connection = PersistanceManager.getConnection();
 
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setString(1, "Simple");
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
-                        //compte = new Compte();
+                        CompteSimple compte_simple = new CompteSimple();
                         compte_simple.setId(rs.getInt("id"));
                         compte_simple.setSolde(rs.getDouble("solde"));
                         compte_simple.setType(rs.getString("type"));
