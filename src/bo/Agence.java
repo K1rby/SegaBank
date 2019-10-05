@@ -1,10 +1,13 @@
 package bo;
 
 public class Agence {
+
+    //Attributs
     private int id;
     private String code;
     private String adresse;
 
+    //Accesseurs
     public int getId() {
         return id;
     }
@@ -29,6 +32,7 @@ public class Agence {
         this.adresse = adresse;
     }
 
+    //Constructeur
     public Agence(int id, String code, String adresse) {
         this.id = id;
         this.code = code;
