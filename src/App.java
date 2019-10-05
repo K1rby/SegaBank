@@ -4,10 +4,11 @@ import dao.CompteEpargneDAO;
 import dao.ComptePayantDAO;
 import dao.CompteSimpleDAO;
 import dao.AgenceDAO;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.list;
+import java.util.List;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -71,14 +72,14 @@ public class App {
         System.out.print("Entrez l'adresse de l'agence : ");
         adresse = sc.nextLine();
 
-        Agence agence = new Agence( code, adresse);
+        Agence agence = new Agence(code, adresse);
 
         try {
-            daoAgence.create( agence );
-        } catch ( IOException | ClassNotFoundException | SQLException e ) {
-            System.err.println( e.getMessage() );
+            daoAgence.create(agence);
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            System.err.println(e.getMessage());
         }
-      
+
         System.out.println("Agence créée avec succès!");
         dspMainMenu();
     }
@@ -94,15 +95,15 @@ public class App {
         List<Agence> listAgences = new ArrayList<>();
         try {
             listAgences = daoAgence.findAll();
-        } catch ( IOException | ClassNotFoundException | SQLException e ) {
-            System.err.println( e.getMessage() );
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            System.err.println(e.getMessage());
         }
 
         int i = 1;
         for (Agence agence : listAgences) {
-            StringBuilder builder = new StringBuilder( i+" - " );
-            builder.append("Code : "+agence.getCode()+" ");
-            builder.append("Adresse : "+agence.getAdresse());
+            StringBuilder builder = new StringBuilder(i + " - ");
+            builder.append("Code : " + agence.getCode() + " ");
+            builder.append("Adresse : " + agence.getAdresse());
             System.out.println(builder.toString());
         }
 
@@ -124,7 +125,7 @@ public class App {
             first = false;
         } while (choixAgence < 1 || choixAgence > size);
 
-        Agence agence = listAgences.get( (choixAgence - 1) );
+        Agence agence = listAgences.get((choixAgence - 1));
 
         dspAgenceMenu(agence);
     }
@@ -138,7 +139,7 @@ public class App {
             if (!first) {
                 System.out.println("Mauvais choix... merci de recommencer !");
             }
-            System.out.println("======== BIENVENUE DANS L'ESPACE DE GESTION DE L'AGENCE "+agence.getCode()+" ========");
+            System.out.println("======== BIENVENUE DANS L'ESPACE DE GESTION DE L'AGENCE " + agence.getCode() + " ========");
             System.out.println("1 - Modifier l'agence");
             System.out.println("2 - Supprimer l'agence");
             System.out.println("3 - Gestion des comptes simple");
@@ -165,13 +166,13 @@ public class App {
                 removeAgence(agence);
                 break;
             case 3:
-            //    dspMenuAccount("simple", agence.getId());
+                //    dspMenuAccount("simple", agence.getId());
                 break;
             case 4:
                 //dspMenuAccount("payant");
                 break;
             case 5:
-              //  dspMenuAccount("epargne");
+                //  dspMenuAccount("epargne");
                 break;
             case 6:
                 dspMainMenu();
@@ -183,75 +184,79 @@ public class App {
 
         IDAO<Long, Agence> daoAgence = new AgenceDAO();
 
-        System.out.println( "======================================" );
-        System.out.println( "====== MODIFICATION D'UNE AGENCE =====" );
-        System.out.println( "======================================" );
+        System.out.println("======================================");
+        System.out.println("====== MODIFICATION D'UNE AGENCE =====");
+        System.out.println("======================================");
 
-        System.out.printf( "Entrez le code (%s): ", agence.getCode() );
+        System.out.printf("Entrez le code (%s): ", agence.getCode());
         String code = sc.nextLine();
-        if ( code != null && !code.isEmpty() ) {
-            agence.setCode( code );
+        if (code != null && !code.isEmpty()) {
+            agence.setCode(code);
         }
-        System.out.printf( "Entrez l'adresse (%s): ", agence.getAdresse() );
+        System.out.printf("Entrez l'adresse (%s): ", agence.getAdresse());
         String adresse = sc.nextLine();
-        if ( adresse != null && !adresse.isEmpty() ) {
-            agence.setAdresse( adresse );
+        if (adresse != null && !adresse.isEmpty()) {
+            agence.setAdresse(adresse);
         }
 
         try {
             daoAgence.update(agence);
-        } catch ( IOException | ClassNotFoundException | SQLException e ) {
-            System.err.println( e.getMessage() );
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            System.err.println(e.getMessage());
         }
-      
-        System.out.println( "Agence modifiée avec succès!" );
+
+        System.out.println("Agence modifiée avec succès!");
         dspAgenceMenu(agence);
     }
-  
+
     private static void removeAgence(Agence agence) {
 
         IDAO<Long, Agence> daoAgence = new AgenceDAO();
 
-        System.out.println( "======================================" );
-        System.out.println( "====== SUPPRESSION D'UNE AGENCE =====" );
-        System.out.println( "======================================" );
+        System.out.println("======================================");
+        System.out.println("====== SUPPRESSION D'UNE AGENCE =====");
+        System.out.println("======================================");
 
         String choix;
         boolean first = true;
-      System.out.printf( "Êtes vous bien sûr de vouloir supprimer cette agence (O/N) ?");
+        do {
+            if (!first) {
+                System.out.println("Mauvais choix... merci de recommencer !");
+            }
+            System.out.printf("Êtes vous bien sûr de vouloir supprimer cette agence (O/N) ?");
             System.out.print("Entrez votre choix : ");
             try {
                 choix = sc.nextLine();
-            }finally {
+            } finally {
                 sc.nextLine();
             }
             first = false;
         } while (choix != "O" || choix != "N");
 
-        switch ( choix ) {
+        switch (choix) {
             case "O":
                 try {
                     daoAgence.remove(agence);
-                } catch ( IOException | ClassNotFoundException | SQLException e ) {
-                    System.err.println( e.getMessage() );
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
                 }
 
-                System.out.println( "Agence supprimée avec succès!" );
+                System.out.println("Agence supprimée avec succès!");
                 dspAgenceMenu(agence);
                 break;
             case "N":
                 dspAgenceMenu(agence);
                 break;
         }
-}
+    }
 
     private static void dspMenuAccount(String type_compte) {
 
         type_compte_copie = type_compte;
         int response;
         boolean first = true;
-      byte choix_compte = 0;
-     
+        byte choix_compte = 0;
+
         do {
             if (!first) {
                 System.out.println("Mauvais choix... merci de recommencer !");
@@ -270,8 +275,7 @@ public class App {
                 System.out.println("7 - Effectuer le calcul des interets");
                 System.out.println("8 - Quitter");
                 choix_compte = 8;
-            }
-            else {
+            } else {
 
                 System.out.println("7 - Quitter");
                 choix_compte = 7;
@@ -292,10 +296,10 @@ public class App {
                 createAccount();
                 break;
             case 2:
-                dspSecondAgenceMenu();
+                //dspSecondAgenceMenu();
                 break;
             case 3:
-               // dspThirdComptePayantMenu();
+                // dspThirdComptePayantMenu();
                 break;
         }
 
@@ -329,8 +333,7 @@ public class App {
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-        else if (type == 2) {
+        } else if (type == 2) {
 
             ComptePayant compte_payant = new ComptePayant();
             compte_payant.setType("Payant");
@@ -342,8 +345,7 @@ public class App {
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        }
-        else if (type == 3) {
+        } else if (type == 3) {
 
             CompteSimple compte_simple = new CompteSimple();
             compte_simple.setType("Simple");
@@ -360,7 +362,6 @@ public class App {
         System.out.println("Compte créée avec succès!");
         dspMenuAccount(type_compte_copie);
     }
-
 
 
     public static void main(String[] args) {
