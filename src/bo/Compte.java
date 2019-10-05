@@ -22,7 +22,7 @@ public abstract class Compte {
     public void setSolde(double solde) {
         this.solde = solde;
     }
-
+    
     //Constructeur
     public Compte(int id, long solde) {
         this.id = id;

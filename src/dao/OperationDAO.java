@@ -86,7 +86,7 @@ public class OperationDAO implements IDAO<Long, Operation> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     if (rs.next()) {
-                        operation = new Operation();
+                        //operation = new Operation();
                         operation.setId(rs.getInt("id"));
                         operation.setType(rs.getString("type"));
                         operation.setDate(rs.getDate("date"));
@@ -112,8 +112,8 @@ public class OperationDAO implements IDAO<Long, Operation> {
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
                 try(ResultSet rs = ps.executeQuery()) {
 
-                    if (rs.next()) {
-                        operation = new Operation();
+                    while (rs.next()) {
+                       // operation = new Operation();
                         operation.setId(rs.getInt("id"));
                         operation.setType(rs.getString("type"));
                         operation.setDate(rs.getDate("date"));

@@ -24,7 +24,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
         if (connection != null) {
             try (PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
 
-                ps.setLong(1, object.getSolde());
+                ps.setDouble(1, object.getSolde());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -45,7 +45,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
 
             try (PreparedStatement ps = connection.prepareStatement(UPDATE_QUERY)) {
 
-                ps.setLong(1, object.getSolde());
+                ps.setDouble(1, object.getSolde());
                 ps.setInt(2, object.getId());
                 ps.executeUpdate();
             }
@@ -80,7 +80,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
                     if (rs.next()) {
                         //compte = new CompteSimple();
                         compte.setId(rs.getInt("id"));
-                        compte.setSolde(rs.getLong("solde"));
+                        compte.setSolde(rs.getDouble("solde"));
                     }
                 }
             }
@@ -103,7 +103,7 @@ public class CompteDAO implements IDAO<Long, Compte> {
                     if (rs.next()) {
                         //compte = new Compte();
                         compte.setId(rs.getInt("id"));
-                        compte.setSolde(rs.getLong("solde"));
+                        compte.setSolde(rs.getDouble("solde"));
                         list.add(compte);
                     }
                 }
