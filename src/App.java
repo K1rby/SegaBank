@@ -16,10 +16,9 @@ public class App {
 
     private static Scanner sc = new Scanner(System.in);
     //private static final String BACKUPS_DIR = "./resources/backups/";
-    private static String type_compte_copie = "";
-    private static List<CompteEpargne> list_epargne = new ArrayList<>();
-    private static List<ComptePayant> list_payant = new ArrayList<>();
-    private static List<CompteSimple> list_simple = new ArrayList<>();
+    private static List<CompteEpargne> listEpargne = new ArrayList<>();
+    private static List<ComptePayant> listPayant = new ArrayList<>();
+    private static List<CompteSimple> listSimple = new ArrayList<>();
 
     public static void dspMainMenu() {
 
@@ -253,9 +252,8 @@ public class App {
         }
     }
 
-    private static void dspMenuAccount(String type_compte, int id_agence) {
+    private static void dspMenuAccount(String typeCompte, int idAgence) {
 
-        type_compte_copie = type_compte;
         int response;
         boolean first = true;
         byte choix_compte = 0;
@@ -274,7 +272,7 @@ public class App {
             System.out.println("4 - Lister les Comptes");
             System.out.println("5 - Effectuer un virement");
             System.out.println("6 - Effectuer un retrait");
-            if (type_compte == "epargne") {
+            if (typeCompte == "epargne") {
                 System.out.println("7 - Effectuer le calcul des interets");
                 System.out.println("8 - Quitter");
                 choix_compte = 8;
@@ -296,91 +294,91 @@ public class App {
 
         switch (response) {
             case 1:
-                createAccount(type_compte, id_agence);
+                createAccount(typeCompte, idAgence);
                 break;
             case 2:
-                updateAccount(type_compte, id_agence);
+                updateAccount(typeCompte, idAgence);
                 break;
             case 3:
-                removeAccount(type_compte, id_agence);
+                removeAccount(typeCompte, idAgence);
                 break;
             case 4:
-                listAccount(type_compte, id_agence);
+                listAccount(typeCompte, idAgence);
                 break;
         }
 
     }
 
-    private static void createAccount(String type_compte, int id_agence) {
+    private static void createAccount(String typeCompte, int idAgence) {
 
         System.out.println("======================================");
         System.out.println("======== CREATION D'UN COMPTE ========");
         System.out.println("======================================");
 
-        IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
-        IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
-        IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
+        IDAO<Long, CompteEpargne> daoCompteEpargne = new CompteEpargneDAO();
+        IDAO<Long, ComptePayant> daoComptePayant = new ComptePayantDAO();
+        IDAO<Long, CompteSimple> daoCompteSimple = new CompteSimpleDAO();
 
 
-        if (type_compte == "epargne") {
+        if (typeCompte == "epargne") {
 
-            CompteEpargne compte_epargne = new CompteEpargne();
-            compte_epargne.setType("Epargne");
-            compte_epargne.setSolde(0);
-            compte_epargne.setTauxInteret((float) 0.02);
-            compte_epargne.setIdAgence(id_agence);
+            CompteEpargne compteEpargne = new CompteEpargne();
+            compteEpargne.setType("Epargne");
+            compteEpargne.setSolde(0);
+            compteEpargne.setTauxInteret((float) 0.02);
+            compteEpargne.setIdAgence(idAgence);
 
             try {
-                dao_compteEpargne.create(compte_epargne);
+                daoCompteEpargne.create(compteEpargne);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type_compte == "payant") {
+        } else if (typeCompte == "payant") {
 
-            ComptePayant compte_payant = new ComptePayant();
-            compte_payant.setType("Payant");
-            compte_payant.setSolde(0);
-            compte_payant.setIdAgence(id_agence);
+            ComptePayant comptePayant = new ComptePayant();
+            comptePayant.setType("Payant");
+            comptePayant.setSolde(0);
+            comptePayant.setIdAgence(idAgence);
 
             try {
-                dao_comptePayant.create(compte_payant);
+                daoComptePayant.create(comptePayant);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type_compte == "simple") {
+        } else if (typeCompte == "simple") {
 
-            CompteSimple compte_simple = new CompteSimple();
-            compte_simple.setType("Simple");
-            compte_simple.setSolde(0);
-            compte_simple.setDecouvert(-400);
-            compte_simple.setIdAgence(id_agence);
+            CompteSimple compteSimple = new CompteSimple();
+            compteSimple.setType("Simple");
+            compteSimple.setSolde(0);
+            compteSimple.setDecouvert(-400);
+            compteSimple.setIdAgence(idAgence);
 
             try {
-                dao_compteSimple.create(compte_simple);
+                daoCompteSimple.create(compteSimple);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
         System.out.println("Compte créée avec succès!");
-        dspMenuAccount(type_compte_copie, id_agence);
+        dspMenuAccount(typeCompte, idAgence);
     }
 
-    private static void updateAccount(String type_compte, int id_agence) {
+    private static void updateAccount(String typeCompte, int idAgence) {
 
         System.out.println("======================================");
         System.out.println("====== MODIFICATION D'UN COMPTE ======");
         System.out.println("======================================");
 
-        IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
-        IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
-        IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
+        IDAO<Long, CompteEpargne> daoCompteEpargne = new CompteEpargneDAO();
+        IDAO<Long, ComptePayant> daoComptePayant = new ComptePayantDAO();
+        IDAO<Long, CompteSimple> daoCompteSimple = new CompteSimpleDAO();
 
-        if (type_compte == "epargne") {
+        if (typeCompte == "epargne") {
 
-            list(type_compte);
+            list(typeCompte);
             System.out.println("Choisissez le compte à modifier ...");
             boolean first = true;
-            int response, size = list_epargne.size();
+            int response, size = listEpargne.size();
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -396,33 +394,33 @@ public class App {
                 first = false;
             } while (response < 1 || response > size);
 
-            CompteEpargne compte_epargne = new CompteEpargne();
+            CompteEpargne compteEpargne = new CompteEpargne();
 
-            CompteEpargne compte_id = list_epargne.get(response - 1);
+            CompteEpargne compteId = listEpargne.get(response - 1);
 
 
-            System.out.printf("Entrez le taux interet (%s): ", compte_id.getTauxInteret());
+            System.out.printf("Entrez le taux interet (%s): ", compteId.getTauxInteret());
             float code = sc.nextFloat();
 
-            compte_epargne.setTauxInteret(code);
-            System.out.printf("Entrez le solde (%s): ", compte_id.getSolde());
+            compteEpargne.setTauxInteret(code);
+            System.out.printf("Entrez le solde (%s): ", compteId.getSolde());
             int solde = sc.nextInt();
-            compte_epargne.setSolde(solde);
-            compte_epargne.setType("Epargne");
-            compte_epargne.setIdAgence(id_agence);
-            compte_epargne.setId(compte_id.getId());
+            compteEpargne.setSolde(solde);
+            compteEpargne.setType("Epargne");
+            compteEpargne.setIdAgence(idAgence);
+            compteEpargne.setId(compteId.getId());
 
             try {
-                dao_compteEpargne.update(compte_epargne);
+                daoCompteEpargne.update(compteEpargne);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type_compte == "payant") {
+        } else if (typeCompte == "payant") {
 
-            list(type_compte);
+            list(typeCompte);
             System.out.println("Choisissez le compte à modifier ...");
             boolean first = true;
-            int response, size = list_payant.size();
+            int response, size = listPayant.size();
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -440,27 +438,27 @@ public class App {
 
             ComptePayant compte_payant = new ComptePayant();
 
-            ComptePayant compte_id = list_payant.get(response - 1);
+            ComptePayant compte_id = listPayant.get(response - 1);
 
             System.out.printf("Entrez le solde (%s): ", compte_id.getSolde());
             int solde = sc.nextInt();
             compte_payant.setSolde(solde);
             compte_payant.setType("Payant");
-            compte_payant.setIdAgence(id_agence);
+            compte_payant.setIdAgence(idAgence);
             compte_payant.setId(compte_id.getId());
 
             try {
-                dao_comptePayant.update(compte_payant);
+                daoComptePayant.update(compte_payant);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type_compte == "simple") {
+        } else if (typeCompte == "simple") {
 
-            list(type_compte);
+            list(typeCompte);
             System.out.println("Choisissez le compte à modifier ...");
             boolean first = true;
-            int response, size = list_simple.size();
-            System.out.println(list_simple.size());
+            int response, size = listSimple.size();
+            System.out.println(listSimple.size());
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -478,7 +476,7 @@ public class App {
 
             CompteSimple compte_simple = new CompteSimple();
 
-            CompteSimple compte_id = list_simple.get(response - 1);
+            CompteSimple compte_id = listSimple.get(response - 1);
 
 
             System.out.printf("Entrez le découvert (%s): ", compte_id.getDecouvert());
@@ -489,18 +487,17 @@ public class App {
             int solde = sc.nextInt();
             compte_simple.setSolde(solde);
             compte_simple.setType("Simple");
-            compte_simple.setIdAgence(id_agence);
+            compte_simple.setIdAgence(idAgence);
             compte_simple.setId(compte_id.getId());
 
             try {
-                dao_compteSimple.update(compte_simple);
+                daoCompteSimple.update(compte_simple);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
         System.out.println("Compte modifier avec succès!");
-        dspMenuAccount(type_compte_copie, id_agence);
-
+        dspMenuAccount(typeCompte, idAgence);
     }
 
     private static void removeAccount(String typeCompte, int id_agence) {
@@ -517,7 +514,7 @@ public class App {
             list(typeCompte);
             System.out.println("Choisissez le compte à supprimer ...");
             boolean first = true;
-            int response, size = list_epargne.size();
+            int response, size = listEpargne.size();
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -534,7 +531,7 @@ public class App {
             } while (response < 1 || response > size);
 
             try {
-                CompteEpargne compte_id = list_epargne.get(response - 1);
+                CompteEpargne compte_id = listEpargne.get(response - 1);
                 dao_compteEpargne.remove(compte_id);
             } catch (IOException | ClassNotFoundException | SQLException e) {
                 System.err.println(e.getMessage());
@@ -549,7 +546,7 @@ public class App {
             list(typeCompte);
             System.out.println("Choisissez le compte à supprimer ...");
             boolean first = true;
-            int response, size = list_simple.size();
+            int response, size = listSimple.size();
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -566,7 +563,7 @@ public class App {
             } while (response < 1 || response > size);
 
             try {
-                CompteSimple compte_id = list_simple.get(response - 1);
+                CompteSimple compte_id = listSimple.get(response - 1);
                 dao_compteSimple.remove(compte_id);
             } catch (IOException | ClassNotFoundException | SQLException e) {
                 System.err.println(e.getMessage());
@@ -581,7 +578,7 @@ public class App {
             list(typeCompte);
             System.out.println("Choisissez le compte à supprimer ...");
             boolean first = true;
-            int response, size = list_payant.size();
+            int response, size = listPayant.size();
             do {
                 if (!first) {
                     System.out.println("Mauvais choix... merci de recommencer !");
@@ -598,7 +595,7 @@ public class App {
             } while (response < 1 || response > size);
 
             try {
-                ComptePayant compte_id = list_payant.get(response - 1);
+                ComptePayant compte_id = listPayant.get(response - 1);
                 dao_comptePayant.remove(compte_id);
             } catch (IOException | ClassNotFoundException | SQLException e) {
                 System.err.println(e.getMessage());
@@ -608,7 +605,6 @@ public class App {
             dspMenuAccount(typeCompte, id_agence);
             dspMenuAccount(typeCompte, id_agence);
         }
-
     }
 
     private static void listAccount(String typeCompte, int id_agence) {
@@ -631,12 +627,12 @@ public class App {
         if (typeCompte == "epargne") {
 
             try {
-                list_epargne = dao_compteEpargne.findAll();
+                listEpargne = dao_compteEpargne.findAll();
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
-            for (CompteEpargne s : list_epargne) {
+            for (CompteEpargne s : listEpargne) {
 
                 StringBuilder builder = new StringBuilder(i + " - ");
                 builder.append("Id Compte : " + s.getId() + " ");
@@ -648,12 +644,12 @@ public class App {
         } else if (typeCompte == "payant") {
 
             try {
-                list_payant = dao_comptePayant.findAll();
+                listPayant = dao_comptePayant.findAll();
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
-            for (ComptePayant s : list_payant) {
+            for (ComptePayant s : listPayant) {
 
                 StringBuilder builder = new StringBuilder(i + " - ");
                 builder.append("Id Compte : " + s.getId() + " ");
@@ -664,12 +660,12 @@ public class App {
         } else if (typeCompte == "simple") {
 
             try {
-                list_simple = dao_compteSimple.findAll();
+                listSimple = dao_compteSimple.findAll();
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
-            for (CompteSimple s : list_simple) {
+            for (CompteSimple s : listSimple) {
 
                 StringBuilder builder = new StringBuilder(i + " - ");
                 builder.append("Id Compte : " + s.getId() + " ");
@@ -680,7 +676,6 @@ public class App {
             }
         }
     }
-
 
     public static void main(String[] args) {
         dspMainMenu();
