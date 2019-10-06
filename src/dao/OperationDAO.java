@@ -101,7 +101,17 @@ public class OperationDAO implements IDAO<Long, Operation> {
     }
 
     @Override
-    public List<Operation> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<Operation> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<Operation> findAllAgences() throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<Operation> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
 
         List<Operation> list = new ArrayList<>();
         Connection connection = PersistanceManager.getConnection();

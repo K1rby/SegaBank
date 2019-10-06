@@ -7,16 +7,15 @@ import dao.AgenceDAO;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class App {
 
-    private static Scanner sc = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in).useLocale(Locale.US);
     //private static final String BACKUPS_DIR = "./resources/backups/";
-    private static String type_compte_copie = "";
+    private static List<CompteEpargne> list_epargne = new ArrayList<>();
+    private static List<ComptePayant> list_payant = new ArrayList<>();
+    private static List<CompteSimple> list_simple = new ArrayList<>();
 
     public static void dspMainMenu() {
 
@@ -94,7 +93,7 @@ public class App {
 
         List<Agence> listAgences = new ArrayList<>();
         try {
-            listAgences = daoAgence.findAll();
+            listAgences = daoAgence.findAllAgences();
         } catch (IOException | ClassNotFoundException | SQLException e) {
             System.err.println(e.getMessage());
         }
@@ -105,6 +104,7 @@ public class App {
             builder.append("Code : " + agence.getCode() + " ");
             builder.append("Adresse : " + agence.getAdresse());
             System.out.println(builder.toString());
+            i++;
         }
 
         boolean first = true;
@@ -166,13 +166,13 @@ public class App {
                 removeAgence(agence);
                 break;
             case 3:
-                //    dspMenuAccount("simple", agence.getId());
+                dspMenuAccount("simple", agence.getId());
                 break;
             case 4:
-                //dspMenuAccount("payant");
+                dspMenuAccount("payant", agence.getId());
                 break;
             case 5:
-                //  dspMenuAccount("epargne");
+                dspMenuAccount("epargne", agence.getId());
                 break;
             case 6:
                 dspMainMenu();
@@ -217,24 +217,29 @@ public class App {
         System.out.println("====== SUPPRESSION D'UNE AGENCE =====");
         System.out.println("======================================");
 
-        String choix;
+        Integer choix;
         boolean first = true;
         do {
             if (!first) {
                 System.out.println("Mauvais choix... merci de recommencer !");
             }
-            System.out.printf("Êtes vous bien sûr de vouloir supprimer cette agence (O/N) ?");
+            System.out.println("Êtes vous bien sûr de vouloir supprimer cette agence ?");
+            System.out.println("1 - Oui");
+            System.out.println("2 - Non");
             System.out.print("Entrez votre choix : ");
+
             try {
-                choix = sc.nextLine();
+                choix = sc.nextInt();
+            } catch (InputMismatchException e) {
+                choix = -1;
             } finally {
                 sc.nextLine();
             }
             first = false;
-        } while (choix != "O" || choix != "N");
+        } while (choix < 1 || choix > 2);
 
         switch (choix) {
-            case "O":
+            case 1:
                 try {
                     daoAgence.remove(agence);
                 } catch (IOException | ClassNotFoundException | SQLException e) {
@@ -242,17 +247,16 @@ public class App {
                 }
 
                 System.out.println("Agence supprimée avec succès!");
-                dspAgenceMenu(agence);
+                dspMainMenu();
                 break;
-            case "N":
+            case 2:
                 dspAgenceMenu(agence);
                 break;
         }
     }
 
-    private static void dspMenuAccount(String type_compte) {
+    private static void dspMenuAccount(String type_compte, int id_agence) {
 
-        type_compte_copie = type_compte;
         int response;
         boolean first = true;
         byte choix_compte = 0;
@@ -263,7 +267,7 @@ public class App {
             }
 
             System.out.println("======================================");
-            System.out.println("========== GESTION DES COMPTES =========");
+            System.out.println("========== GESTION DES COMPTES =======");
             System.out.println("======================================");
             System.out.println("1 - Ajouter un Compte");
             System.out.println("2 - Modifier un Compte");
@@ -293,65 +297,80 @@ public class App {
 
         switch (response) {
             case 1:
-                createAccount();
+                createAccount(type_compte, id_agence);
                 break;
             case 2:
-                //dspSecondAgenceMenu();
+                updateAccount(type_compte, id_agence);
                 break;
             case 3:
-                // dspThirdComptePayantMenu();
+                removeAccount(type_compte, id_agence);
+                break;
+            case 4:
+                listAccount(type_compte, id_agence);
+                break;
+            case 5:
+                doPayment(type_compte, id_agence);
+                break;
+            case 6:
+                doWithdrawal(type_compte, id_agence);
+                break;
+            case 7:
+                if (type_compte == "epargne") {
+                    doAdvantage(type_compte, id_agence);
+                } else {
+                    dspMainMenu();
+                }
+                break;
+            case 8:
+                dspMainMenu();
                 break;
         }
 
     }
 
-    private static void createAccount() {
+    private static void createAccount(String type_compte, int id_agence) {
 
         System.out.println("======================================");
-        System.out.println("======== CREATION D'UN COMPTE =======");
+        System.out.println("======== CREATION D'UN COMPTE ========");
         System.out.println("======================================");
 
         IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
         IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
         IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
-        System.out.println("Choisir le type de compte : ");
-        System.out.println("1 - Epargne");
-        System.out.println("2 - Payant");
-        System.out.println("3 - Simple");
-        byte type = sc.nextByte();
 
-        if (type == 1) {
+
+        if (type_compte == "epargne") {
 
             CompteEpargne compte_epargne = new CompteEpargne();
-            compte_epargne.setType("Epargne");
+            compte_epargne.setType("epargne");
             compte_epargne.setSolde(0);
             compte_epargne.setTauxInteret((float) 0.02);
-            compte_epargne.setIdAgence(1);
+            compte_epargne.setIdAgence(id_agence);
 
             try {
                 dao_compteEpargne.create(compte_epargne);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type == 2) {
+        } else if (type_compte == "payant") {
 
             ComptePayant compte_payant = new ComptePayant();
-            compte_payant.setType("Payant");
+            compte_payant.setType("payant");
             compte_payant.setSolde(0);
-            compte_payant.setIdAgence(1);
+            compte_payant.setIdAgence(id_agence);
 
             try {
                 dao_comptePayant.create(compte_payant);
             } catch (SQLException | IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-        } else if (type == 3) {
+        } else if (type_compte == "simple") {
 
             CompteSimple compte_simple = new CompteSimple();
-            compte_simple.setType("Simple");
+            compte_simple.setType("simple");
             compte_simple.setSolde(0);
             compte_simple.setDecouvert(-400);
-            compte_simple.setIdAgence(1);
+            compte_simple.setIdAgence(id_agence);
 
             try {
                 dao_compteSimple.create(compte_simple);
@@ -360,7 +379,749 @@ public class App {
             }
         }
         System.out.println("Compte créée avec succès!");
-        dspMenuAccount(type_compte_copie);
+        dspMenuAccount(type_compte, id_agence);
+    }
+
+    private static void updateAccount(String type_compte, int id_agence) {
+
+        System.out.println("======================================");
+        System.out.println("====== MODIFICATION D'UN COMPTE ======");
+        System.out.println("======================================");
+
+        IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
+        IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
+        IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
+
+        if (type_compte == "epargne") {
+
+            list(type_compte, id_agence);
+            System.out.println("Choisissez le compte à modifier ...");
+            boolean first = true;
+            int response, size = list_epargne.size();
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            CompteEpargne compte_epargne = new CompteEpargne();
+
+            CompteEpargne compte_id = list_epargne.get(response - 1);
+
+
+            System.out.printf("Entrez le taux interet (%s): ", compte_id.getTauxInteret());
+            double code = sc.nextDouble();
+
+            compte_epargne.setTauxInteret((float)code);
+            System.out.printf("Entrez le solde (%s): ", compte_id.getSolde());
+            int solde = sc.nextInt();
+            compte_epargne.setSolde(solde);
+            compte_epargne.setType("epargne");
+            compte_epargne.setIdAgence(id_agence);
+            compte_epargne.setId(compte_id.getId());
+
+            try {
+                dao_compteEpargne.update(compte_epargne);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else if (type_compte == "payant") {
+
+            list(type_compte, id_agence);
+            System.out.println("Choisissez le compte à modifier ...");
+            boolean first = true;
+            int response, size = list_payant.size();
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            ComptePayant compte_payant = new ComptePayant();
+
+            ComptePayant compte_id = list_payant.get(response - 1);
+
+            System.out.printf("Entrez le solde (%s): ", compte_id.getSolde());
+            int solde = sc.nextInt();
+            compte_payant.setSolde(solde);
+            compte_payant.setType("payant");
+            compte_payant.setIdAgence(id_agence);
+            compte_payant.setId(compte_id.getId());
+
+            try {
+                dao_comptePayant.update(compte_payant);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        } else if (type_compte == "simple") {
+
+            list(type_compte, id_agence);
+            System.out.println("Choisissez le compte à modifier ...");
+            boolean first = true;
+            int response, size = list_simple.size();
+            System.out.println(list_simple.size());
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            CompteSimple compte_simple = new CompteSimple();
+
+            CompteSimple compte_id = list_simple.get(response - 1);
+
+
+            System.out.printf("Entrez le découvert (%s): ", compte_id.getDecouvert());
+            int code = sc.nextInt();
+
+            compte_simple.setDecouvert(code);
+            System.out.printf("Entrez le solde (%s): ", compte_id.getSolde());
+            int solde = sc.nextInt();
+            compte_simple.setSolde(solde);
+            compte_simple.setType("simple");
+            compte_simple.setIdAgence(id_agence);
+            compte_simple.setId(compte_id.getId());
+
+            try {
+                dao_compteSimple.update(compte_simple);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("Compte modifier avec succès!");
+        dspMenuAccount(type_compte, id_agence);
+
+    }
+
+    private static void removeAccount(String typeCompte, int id_agence) {
+
+        System.out.println("======================================");
+        System.out.println("====== SUPPRESION D'UN COMPTE ======");
+        System.out.println("======================================");
+
+        IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
+        IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
+        IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
+
+        if (typeCompte == "epargne") {
+            list(typeCompte, id_agence);
+            System.out.println("Choisissez le compte à supprimer ...");
+            boolean first = true;
+            int response, size = list_epargne.size();
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            try {
+                CompteEpargne compte_id = list_epargne.get(response - 1);
+                dao_compteEpargne.remove(compte_id);
+            } catch (IOException | ClassNotFoundException | SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
+            System.out.println("Compte supprimée avec succès!");
+            dspMenuAccount(typeCompte, id_agence);
+            dspMenuAccount(typeCompte, id_agence);
+
+        } else if (typeCompte == "simple") {
+
+            list(typeCompte, id_agence);
+            System.out.println("Choisissez le compte à supprimer ...");
+            boolean first = true;
+            int response, size = list_simple.size();
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            try {
+                CompteSimple compte_id = list_simple.get(response - 1);
+                dao_compteSimple.remove(compte_id);
+            } catch (IOException | ClassNotFoundException | SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
+            System.out.println("Compte supprimée avec succès!");
+            dspMenuAccount(typeCompte, id_agence);
+
+            dspMenuAccount(typeCompte, id_agence);
+
+        } else if (typeCompte == "payant") {
+            list(typeCompte, id_agence);
+            System.out.println("Choisissez le compte à supprimer ...");
+            boolean first = true;
+            int response, size = list_payant.size();
+            do {
+                if (!first) {
+                    System.out.println("Mauvais choix... merci de recommencer !");
+                }
+                System.out.print("Votre choix : ");
+                try {
+                    response = sc.nextInt();
+                } catch (InputMismatchException e) {
+                    response = -1;
+                } finally {
+                    sc.nextLine();
+                }
+                first = false;
+            } while (response < 1 || response > size);
+
+            try {
+                ComptePayant compte_id = list_payant.get(response - 1);
+                dao_comptePayant.remove(compte_id);
+            } catch (IOException | ClassNotFoundException | SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
+            System.out.println("Compte supprimée avec succès!");
+            dspMenuAccount(typeCompte, id_agence);
+            dspMenuAccount(typeCompte, id_agence);
+        }
+
+    }
+
+    private static void listAccount(String typeCompte, int id_agence) {
+
+        System.out.println("======================================");
+        System.out.println("====== LISTE DES COMPTES ==============");
+        System.out.println("======================================");
+        list(typeCompte, id_agence);
+        dspMenuAccount(typeCompte, id_agence);
+    }
+
+    private static void list(String typeCompte, int idAgence) {
+
+        IDAO<Long, CompteEpargne> dao_compteEpargne = new CompteEpargneDAO();
+        IDAO<Long, ComptePayant> dao_comptePayant = new ComptePayantDAO();
+        IDAO<Long, CompteSimple> dao_compteSimple = new CompteSimpleDAO();
+
+        int i = 1;
+
+        if (typeCompte == "epargne") {
+
+            try {
+                list_epargne = dao_compteEpargne.findAll(idAgence);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            for (CompteEpargne s : list_epargne) {
+
+                StringBuilder builder = new StringBuilder(i + " - ");
+                builder.append("Id Compte : " + s.getId() + " ");
+                builder.append("Taux Interet : " + s.getTauxInteret() + " ");
+                builder.append("Solde : " + s.getSolde());
+                System.out.println(builder.toString());
+                i++;
+            }
+        } else if (typeCompte == "payant") {
+
+            try {
+                list_payant = dao_comptePayant.findAll(idAgence);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            for (ComptePayant s : list_payant) {
+
+                StringBuilder builder = new StringBuilder(i + " - ");
+                builder.append("Id Compte : " + s.getId() + " ");
+                builder.append("Solde : " + s.getSolde());
+                System.out.println(builder.toString());
+                i++;
+            }
+        } else if (typeCompte == "simple") {
+
+            try {
+                list_simple = dao_compteSimple.findAll(idAgence);
+            } catch (SQLException | IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            for (CompteSimple s : list_simple) {
+
+                StringBuilder builder = new StringBuilder(i + " - ");
+                builder.append("Id Compte : " + s.getId() + " ");
+                builder.append("Découvert : " + s.getDecouvert() + " ");
+                builder.append("Solde : " + s.getSolde());
+                System.out.println(builder.toString());
+                i++;
+            }
+        }
+    }
+
+    private static void doPayment(String type, int idAgence) {
+
+        System.out.println("=====================================");
+        System.out.println("============= VERSEMENT =============");
+        System.out.println("=====================================");
+
+        boolean first = true;
+        int choixAccount;
+        int size;
+        int i;
+        double amount;
+
+        switch (type) {
+            case "simple":
+                IDAO<Long, CompteSimple> daoSimpleAccount = new CompteSimpleDAO();
+
+                List<CompteSimple> listSimpleAccounts = new ArrayList<>();
+                try {
+                    listSimpleAccounts = daoSimpleAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (CompteSimple simpleAccount : listSimpleAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + simpleAccount.getId() + " ");
+                    builder.append("Solde : " + simpleAccount.getSolde() + " €");
+                    builder.append("Decouvert : " + simpleAccount.getDecouvert() + " €");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listSimpleAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                CompteSimple account = listSimpleAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du versement : ");
+                amount = sc.nextDouble();
+
+                account.versement(amount);
+
+                try {
+                    daoSimpleAccount.update(account);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                System.out.println("Versement effectué avec succès !");
+                dspMenuAccount(type, idAgence);
+
+                break;
+            case "payant":
+
+                IDAO<Long, ComptePayant> daoPayingAccount = new ComptePayantDAO();
+
+                List<ComptePayant> listPayingAccounts = new ArrayList<>();
+                try {
+                    listPayingAccounts = daoPayingAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (ComptePayant payingAccount : listPayingAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + payingAccount.getId() + " ");
+                    builder.append("Solde : " + payingAccount.getSolde() + " €");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listPayingAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                ComptePayant payingAccount = listPayingAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du versement : ");
+                amount = sc.nextDouble();
+
+                payingAccount.versement(amount);
+
+                try {
+                    daoPayingAccount.update(payingAccount);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                System.out.println("Versement effectué avec succès !");
+                dspMenuAccount(type, idAgence);
+
+                break;
+            case "epargne":
+
+                IDAO<Long, CompteEpargne> daoSavingAccount = new CompteEpargneDAO();
+
+                List<CompteEpargne> listSavingAccounts = new ArrayList<>();
+                try {
+                    listSavingAccounts = daoSavingAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (CompteEpargne savingAccount : listSavingAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + savingAccount.getId() + " ");
+                    builder.append("Solde : " + savingAccount.getSolde() + " €");
+                    builder.append("Taux d'intérêt : " + savingAccount.getTauxInteret() + " %");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listSavingAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                CompteEpargne savingAccount = listSavingAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du versement : ");
+                amount = sc.nextDouble();
+
+                savingAccount.versement(amount);
+
+                try {
+                    daoSavingAccount.update(savingAccount);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                System.out.println("Versement effectué avec succès !");
+                dspMenuAccount(type, idAgence);
+
+                break;
+        }
+    }
+
+    private static void doWithdrawal(String type, int idAgence) {
+
+        System.out.println("=====================================");
+        System.out.println("============== RETRAIT ==============");
+        System.out.println("=====================================");
+
+        boolean first = true;
+        int choixAccount;
+        int size;
+        int i;
+        double amount;
+
+        switch (type) {
+            case "simple":
+                IDAO<Long, CompteSimple> daoSimpleAccount = new CompteSimpleDAO();
+
+                List<CompteSimple> listSimpleAccounts = new ArrayList<>();
+                try {
+                    listSimpleAccounts = daoSimpleAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (CompteSimple simpleAccount : listSimpleAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + simpleAccount.getId() + " ");
+                    builder.append("Solde : " + simpleAccount.getSolde() + " €");
+                    builder.append("Decouvert : " + simpleAccount.getDecouvert() + " €");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listSimpleAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                CompteSimple account = listSimpleAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du retrait : ");
+                amount = sc.nextDouble();
+
+                account.retrait(amount);
+
+                try {
+                    daoSimpleAccount.update(account);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                dspMenuAccount(type, idAgence);
+
+                break;
+            case "payant":
+
+                IDAO<Long, ComptePayant> daoPayingAccount = new ComptePayantDAO();
+
+                List<ComptePayant> listPayingAccounts = new ArrayList<>();
+                try {
+                    listPayingAccounts = daoPayingAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (ComptePayant payingAccount : listPayingAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + payingAccount.getId() + " ");
+                    builder.append("Solde : " + payingAccount.getSolde() + " €");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listPayingAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                ComptePayant payingAccount = listPayingAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du retrait : ");
+                amount = sc.nextDouble();
+
+                payingAccount.retrait(amount);
+
+                try {
+                    daoPayingAccount.update(payingAccount);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                System.out.println("Retrait effectué avec succès !");
+                dspMenuAccount(type, idAgence);
+
+                break;
+            case "epargne":
+
+                IDAO<Long, CompteEpargne> daoSavingAccount = new CompteEpargneDAO();
+
+                List<CompteEpargne> listSavingAccounts = new ArrayList<>();
+                try {
+                    listSavingAccounts = daoSavingAccount.findAll(idAgence);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                i = 1;
+                for (CompteEpargne savingAccount : listSavingAccounts) {
+                    StringBuilder builder = new StringBuilder(i + " - ");
+                    builder.append("ID : " + savingAccount.getId() + " ");
+                    builder.append("Solde : " + savingAccount.getSolde() + " €");
+                    builder.append("Taux d'intérêt : " + savingAccount.getTauxInteret() + " %");
+                    System.out.println(builder.toString());
+                    i++;
+                }
+
+                first = true;
+                size = listSavingAccounts.size();
+                do {
+                    if (!first) {
+                        System.out.println("Mauvais choix... merci de recommencer !");
+                    }
+                    System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+                    try {
+                        choixAccount = sc.nextInt();
+                    } catch (InputMismatchException e) {
+                        choixAccount = -1;
+                    } finally {
+                        sc.nextLine();
+                    }
+                    first = false;
+                } while (choixAccount < 1 || choixAccount > size);
+
+                CompteEpargne savingAccount = listSavingAccounts.get((choixAccount - 1));
+
+                System.out.println("================================");
+                System.out.print("Veuillez saisir le montant total du retrait : ");
+                amount = sc.nextDouble();
+
+                savingAccount.retrait(amount);
+
+                try {
+                    daoSavingAccount.update(savingAccount);
+                } catch (IOException | ClassNotFoundException | SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                System.out.println("Retrait effectué avec succès !");
+                dspMenuAccount(type, idAgence);
+
+                break;
+        }
+    }
+
+    private static void doAdvantage(String type, int idAgence) {
+
+        System.out.println("=====================================");
+        System.out.println("========== CALCUL INTERÊTS ==========");
+        System.out.println("=====================================");
+
+        boolean first = true;
+        int choixAccount;
+        int size;
+        int i;
+        double amount;
+
+        IDAO<Long, CompteEpargne> daoSavingAccount = new CompteEpargneDAO();
+
+        List<CompteEpargne> listSavingAccounts = new ArrayList<>();
+        try {
+            listSavingAccounts = daoSavingAccount.findAll(idAgence);
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            System.err.println(e.getMessage());
+        }
+
+        i = 1;
+        for (CompteEpargne savingAccount : listSavingAccounts) {
+            StringBuilder builder = new StringBuilder(i + " - ");
+            builder.append("ID : " + savingAccount.getId() + " ");
+            builder.append("Solde : " + savingAccount.getSolde() + " €");
+            builder.append("Taux d'intérêt : " + savingAccount.getTauxInteret() + " %");
+            System.out.println(builder.toString());
+            i++;
+        }
+
+        first = true;
+        size = listSavingAccounts.size();
+        do {
+            if (!first) {
+                System.out.println("Mauvais choix... merci de recommencer !");
+            }
+            System.out.print("Veuillez saisir le numero correspondant au compte souhaité : ");
+            try {
+                choixAccount = sc.nextInt();
+            } catch (InputMismatchException e) {
+                choixAccount = -1;
+            } finally {
+                sc.nextLine();
+            }
+            first = false;
+        } while (choixAccount < 1 || choixAccount > size);
+
+        CompteEpargne savingAccount = listSavingAccounts.get((choixAccount - 1));
+
+        savingAccount.calculInteret();
+
+        try {
+            daoSavingAccount.update(savingAccount);
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            System.err.println(e.getMessage());
+        }
+
+        System.out.println("Calcul des intérêts effectué avec succès !");
+        dspMenuAccount(type, idAgence);
+
     }
 
 

@@ -21,12 +21,12 @@ public class CompteEpargne extends Compte {
 
     //Méthodes
     @Override
-    public void versement(int montant) {
+    public void versement(double montant) {
         this.solde = this.solde + montant;
     }
 
     @Override
-    public void retrait(int montant) {
+    public void retrait(double montant) {
         this.solde = this.solde - montant;
     }
 

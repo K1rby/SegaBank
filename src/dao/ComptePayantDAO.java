@@ -12,10 +12,10 @@ import java.util.List;
 public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
 
     private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, idAgence) VALUES (?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET idAgence = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, type = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type = 'payant' AND idAgence = ?";
 
     @Override
     public void create(ComptePayant object) throws SQLException, IOException, ClassNotFoundException {
@@ -49,8 +49,7 @@ public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
 
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
-                ps.setInt(3, object.getIdAgence());
-                ps.setInt(4, object.getId());
+                ps.setInt(3, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -94,7 +93,7 @@ public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
     }
 
     @Override
-    public List<ComptePayant> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<ComptePayant> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException {
 
         List<ComptePayant> list = new ArrayList<>();
         ComptePayant compte_payant = new ComptePayant();
@@ -103,6 +102,8 @@ public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setLong(1, idAgence);
+
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
@@ -116,5 +117,15 @@ public class ComptePayantDAO implements IDAO<Long, ComptePayant> {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<ComptePayant> findAllAgences() throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<ComptePayant> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+        return null;
     }
 }

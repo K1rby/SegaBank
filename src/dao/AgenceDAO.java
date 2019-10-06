@@ -92,7 +92,12 @@ public class AgenceDAO implements IDAO<Long, Agence> {
     }
 
     @Override
-    public List<Agence> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<Agence> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<Agence> findAllAgences() throws SQLException, IOException, ClassNotFoundException {
 
         List<Agence> list = new ArrayList<>();
         Connection connection = PersistanceManager.getConnection();
@@ -113,5 +118,10 @@ public class AgenceDAO implements IDAO<Long, Agence> {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<Agence> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+        return null;
     }
 }

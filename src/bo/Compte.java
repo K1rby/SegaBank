@@ -45,8 +45,8 @@ public abstract class Compte {
     public Compte() { }
 
     //Méthodes
-    public abstract void versement(int montant);
+    public abstract void versement(double montant);
 
-    public abstract void retrait(int montant);
+    public abstract void retrait(double montant);
 
 }

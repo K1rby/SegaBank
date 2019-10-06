@@ -14,5 +14,9 @@ public interface IDAO<ID, E> {
 
     E findById(ID id) throws SQLException, IOException, ClassNotFoundException;
 
-    List<E> findAll() throws SQLException, IOException, ClassNotFoundException;
+    List<E> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException;
+
+    List<E> findAllAgences() throws SQLException, IOException, ClassNotFoundException;
+
+    List<E> findAllOperations() throws SQLException, IOException, ClassNotFoundException;
 }

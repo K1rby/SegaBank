@@ -12,10 +12,10 @@ import java.util.List;
 public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
 
     private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, tauxInteret, idAgence) VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET tauxInteret = ?, SET idAgence = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, type = ?, tauxInteret = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type = 'epargne' AND idAgence = ?";
 
     @Override
     public void create(CompteEpargne object) throws SQLException, IOException, ClassNotFoundException {
@@ -51,8 +51,7 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
                 ps.setFloat(3, object.getTauxInteret());
-                ps.setFloat(4, object.getIdAgence());
-                ps.setInt(5, object.getId());
+                ps.setInt(4, object.getId());
                 ps.executeUpdate();
             }
         }
@@ -87,7 +86,7 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
                         compte_epargne.setId(rs.getInt("id"));
                         compte_epargne.setSolde(rs.getDouble("solde"));
                         compte_epargne.setType(rs.getString("type"));
-                        compte_epargne.setTauxInteret(rs.getInt("tauxInteret"));
+                        compte_epargne.setTauxInteret(rs.getFloat("tauxInteret"));
                         compte_epargne.setIdAgence(rs.getInt("idAgence"));
                     }
                 }
@@ -97,7 +96,7 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
     }
 
     @Override
-    public List<CompteEpargne> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<CompteEpargne> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException {
 
         List<CompteEpargne> list = new ArrayList<>();
         CompteEpargne compte_epargne = new CompteEpargne();
@@ -106,13 +105,15 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setLong(1, idAgence);
+
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
                         compte_epargne.setId(rs.getInt("id"));
                         compte_epargne.setSolde(rs.getDouble("solde"));
                         compte_epargne.setType(rs.getString("type"));
-                        compte_epargne.setTauxInteret(rs.getInt("TauxInteret"));
+                        compte_epargne.setTauxInteret(rs.getFloat("TauxInteret"));
                         compte_epargne.setIdAgence(rs.getInt("idAgence"));
                         list.add(compte_epargne);
                     }
@@ -120,5 +121,15 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
             }
         }
         return list;
+    }
+
+    @Override
+    public List<CompteEpargne> findAllAgences() throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<CompteEpargne> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+        return null;
     }
 }

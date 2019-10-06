@@ -7,12 +7,12 @@ public class ComptePayant extends Compte {
 
     //Méthodes
     @Override
-    public void versement(int montant) {
+    public void versement(double montant) {
         this.solde = this.solde + (montant * 0.95);
     }
 
     @Override
-    public void retrait(int montant) {
+    public void retrait(double montant) {
         this.solde = this.solde - (montant * 1.05);
     }
 

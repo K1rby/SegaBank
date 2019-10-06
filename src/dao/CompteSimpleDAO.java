@@ -12,11 +12,11 @@ import java.util.List;
 
 public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, decouvert) VALUES (?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET solde = ?, SET type = ?, SET decouvert = ? WHERE id = ?";
+    private static final String INSERT_QUERY = "INSERT INTO compte (solde, type, decouvert, idAgence) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE compte SET solde= ?, type= ?, decouvert= ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
     private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM compte";
+    private static final String FIND_ALLQUERY = "SELECT * FROM compte WHERE type = 'simple' AND idAgence = ?";
 
     @Override
     public void create(CompteSimple object) throws SQLException, IOException, ClassNotFoundException {
@@ -28,6 +28,7 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
                 ps.setDouble(1, object.getSolde());
                 ps.setString(2, object.getType());
                 ps.setInt(3, object.getDecouvert());
+                ps.setInt(4, object.getIdAgence());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -96,28 +97,39 @@ public class CompteSimpleDAO implements IDAO<Long, CompteSimple> {
     }
 
     @Override
-    public List<CompteSimple> findAll() throws SQLException, IOException, ClassNotFoundException {
+    public List<CompteSimple> findAll(int idAgence) throws SQLException, IOException, ClassNotFoundException {
 
         List<CompteSimple> list = new ArrayList<>();
-        CompteSimple compte_simple = null;
         Connection connection = PersistanceManager.getConnection();
 
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+                ps.setLong(1, idAgence);
+
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
-                        //compte = new Compte();
-                        compte_simple.setId(rs.getInt("id"));
-                        compte_simple.setSolde(rs.getDouble("solde"));
-                        compte_simple.setType(rs.getString("type"));
-                        compte_simple.setDecouvert(rs.getInt("decouvert"));
-                        list.add(compte_simple);
+                        CompteSimple account = new CompteSimple();
+                        account.setId(rs.getInt("id"));
+                        account.setSolde(rs.getDouble("solde"));
+                        account.setType(rs.getString("type"));
+                        account.setDecouvert(rs.getInt("decouvert"));
+                        list.add(account);
                     }
                 }
             }
         }
         return list;
+    }
+
+    @Override
+    public List<CompteSimple> findAllAgences() throws SQLException, IOException, ClassNotFoundException {
+        return null;
+    }
+
+    @Override
+    public List<CompteSimple> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+        return null;
     }
 }

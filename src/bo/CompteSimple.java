@@ -19,14 +19,18 @@ public class CompteSimple extends Compte {
 
     //Méthodes
     @Override
-    public void versement(int montant) {
+    public void versement(double montant) {
         this.solde = this.solde + montant;
     }
 
     @Override
-    public void retrait(int montant) {
-        if((this.solde - montant) < this.decouvert){
+    public void retrait(double montant) {
+        if((this.solde - montant) > this.decouvert){
             this.solde = this.solde - montant;
+            System.out.println("Retrait effectué avec succès !");
+        }else{
+            System.out.println("Retrait annulé, vous avez dépassé le découvert !");
+
         }
     }
 }
