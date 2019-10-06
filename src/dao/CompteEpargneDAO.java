@@ -129,7 +129,7 @@ public class CompteEpargneDAO implements IDAO<Long, CompteEpargne> {
     }
 
     @Override
-    public List<CompteEpargne> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+    public List<CompteEpargne> findAllOperations(int idCompte) throws SQLException, IOException, ClassNotFoundException {
         return null;
     }
 }

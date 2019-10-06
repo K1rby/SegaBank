@@ -121,7 +121,7 @@ public class AgenceDAO implements IDAO<Long, Agence> {
     }
 
     @Override
-    public List<Agence> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+    public List<Agence> findAllOperations(int idCompte) throws SQLException, IOException, ClassNotFoundException {
         return null;
     }
 }

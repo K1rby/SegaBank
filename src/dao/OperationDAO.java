@@ -11,11 +11,11 @@ import java.util.List;
 
 public class OperationDAO implements IDAO<Long, Operation> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (type, date, montant, idAgence, idCompte) VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET type = ?, SET date = ?, SET montant = ?, SET idAgence = ?, SET idCompte = ? WHERE id = ?";
-    private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
-    private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
-    private static final String FIND_ALLQUERY = "SELECT * FROM operation";
+    private static final String INSERT_QUERY = "INSERT INTO operation (type, date, montant, idAgence, idCompte) VALUES (?, CURRENT_TIMESTAMP , ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE operation SET type = ?, montant = ?, idAgence = ?, idCompte = ? WHERE id = ?";
+    private static final String DELETE_QUERY = "DELETE FROM operation WHERE id= ?";
+    private static final String FIND_QUERY = "SELECT * FROM operation WHERE id= ?";
+    private static final String FIND_ALL_OP_BY_ACCOUNT_QUERY = "SELECT * FROM operation WHERE idCompte = ?";
 
     @Override
     public void create(Operation object) throws SQLException, IOException, ClassNotFoundException {
@@ -25,10 +25,9 @@ public class OperationDAO implements IDAO<Long, Operation> {
             try (PreparedStatement ps = connection.prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS)) {
 
                 ps.setString(1, object.getType());
-                ps.setDate(2, object.getDate());
-                ps.setInt(3, object.getMontant());
-                ps.setInt(4, object.getIdAgence());
-                ps.setInt(5, object.getIdCompte());
+                ps.setInt(2, object.getMontant());
+                ps.setInt(3, object.getIdAgence());
+                ps.setInt(4, object.getIdCompte());
                 ps.executeUpdate();
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -111,7 +110,7 @@ public class OperationDAO implements IDAO<Long, Operation> {
     }
 
     @Override
-    public List<Operation> findAllOperations() throws SQLException, IOException, ClassNotFoundException {
+    public List<Operation> findAllOperations(int idCompte) throws SQLException, IOException, ClassNotFoundException {
 
         List<Operation> list = new ArrayList<>();
         Connection connection = PersistanceManager.getConnection();
@@ -119,7 +118,9 @@ public class OperationDAO implements IDAO<Long, Operation> {
 
         if (connection != null) {
 
-            try(PreparedStatement ps = connection.prepareStatement(FIND_ALLQUERY)) {
+            try(PreparedStatement ps = connection.prepareStatement(FIND_ALL_OP_BY_ACCOUNT_QUERY)) {
+                ps.setLong(1, idCompte);
+
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {

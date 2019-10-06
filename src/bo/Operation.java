@@ -80,4 +80,6 @@ public class Operation {
         this.idAgence = idAgence;
         this.idCompte = idCompte;
     }
+
+    public Operation(){}
 }
