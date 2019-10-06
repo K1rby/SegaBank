@@ -11,10 +11,10 @@ import java.util.List;
 
 public class OperationDAO implements IDAO<Long, Operation> {
 
-    private static final String INSERT_QUERY = "INSERT INTO compte (type, date, montant, idAgence, idCompte) VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE compte SET type = ?, date = ?, montant = ?, idAgence = ?, idCompte = ? WHERE id = ?";
-    private static final String DELETE_QUERY = "DELETE FROM compte WHERE id= ?";
-    private static final String FIND_QUERY = "SELECT * FROM compte WHERE id= ?";
+    private static final String INSERT_QUERY = "INSERT INTO operation (type, date, montant, idAgence, idCompte) VALUES (?, ?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "UPDATE operation SET type = ?, date = ?, montant = ?, idAgence = ?, idCompte = ? WHERE id = ?";
+    private static final String DELETE_QUERY = "DELETE FROM operation WHERE id= ?";
+    private static final String FIND_QUERY = "SELECT * FROM operation WHERE id= ?";
     private static final String FIND_ALLQUERY = "SELECT * FROM operation";
 
     @Override
@@ -77,8 +77,8 @@ public class OperationDAO implements IDAO<Long, Operation> {
     @Override
     public Operation findById(Long aLong) throws SQLException, IOException, ClassNotFoundException {
 
+        Operation operation = new Operation();
         Connection connection = PersistanceManager.getConnection();
-        Operation operation = null;
         if (connection != null) {
 
             try(PreparedStatement ps = connection.prepareStatement(FIND_QUERY)) {
@@ -86,7 +86,6 @@ public class OperationDAO implements IDAO<Long, Operation> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     if (rs.next()) {
-                        //operation = new Operation();
                         operation.setId(rs.getInt("id"));
                         operation.setType(rs.getString("type"));
                         operation.setDate(rs.getDate("date"));
@@ -105,7 +104,6 @@ public class OperationDAO implements IDAO<Long, Operation> {
 
         List<Operation> list = new ArrayList<>();
         Connection connection = PersistanceManager.getConnection();
-        Operation operation = null;
 
         if (connection != null) {
 
@@ -113,7 +111,7 @@ public class OperationDAO implements IDAO<Long, Operation> {
                 try(ResultSet rs = ps.executeQuery()) {
 
                     while (rs.next()) {
-                       // operation = new Operation();
+                        Operation operation = new Operation();
                         operation.setId(rs.getInt("id"));
                         operation.setType(rs.getString("type"));
                         operation.setDate(rs.getDate("date"));

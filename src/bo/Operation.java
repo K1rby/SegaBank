@@ -72,12 +72,5 @@ public class Operation {
     }
 
     //Constructeur
-    public Operation(int id, String type, Date date, int montant, int idAgence, int idCompte) {
-        this.id = id;
-        this.type = type;
-        this.date = date;
-        this.montant = montant;
-        this.idAgence = idAgence;
-        this.idCompte = idCompte;
-    }
+    public Operation() {}
 }
